@@ -1,0 +1,49 @@
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-link {
+    font-size: 1.1rem;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 1rem;
+}
+
+footer {
+    background-color: #f8f9fa;
+    padding: 10px 0;
+}
+
+.footer-text {
+    margin: 0;
+}
+
+.search-bar {
+    max-width: 300px;
+}
+
+.navbar-nav .nav-item .nav-link {
+    margin-left: 10px;
+}
+
+.btn-outline-success {
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.btn-outline-success:hover {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.card img {
+    max-height: 200px;
+    object-fit: cover;
+}
