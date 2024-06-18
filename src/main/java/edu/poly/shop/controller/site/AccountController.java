@@ -1,5 +1,6 @@
 package edu.poly.shop.controller.site;
 
+import java.io.File;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import edu.poly.shop.domain.Account;
@@ -21,6 +23,7 @@ import edu.poly.shop.model.AccountDto;
 import edu.poly.shop.model.CategoryDto;
 import edu.poly.shop.service.AccountService;
 import edu.poly.shop.service.MailerService;
+import edu.poly.shop.service.ParamService;
 import edu.poly.shop.service.SessionService;
 import groovy.cli.Option;
 import jakarta.validation.Valid;
@@ -34,6 +37,8 @@ public class AccountController {
 	private MailerService mailerService;
 	@Autowired
 	private SessionService sessionService;
+	@Autowired
+	private ParamService paramService;
 
 	@RequestMapping("/account/login")
 	public String login(@ModelAttribute("account") Account account, BindingResult result, Model model) {
@@ -63,12 +68,20 @@ public class AccountController {
 	public ModelAndView addUser(ModelMap model, @Valid @ModelAttribute("account") AccountDto dto,
 			BindingResult result) {
 		if (result.hasErrors()) {
-
+System.out.println(result.toString());
 			return new ModelAndView("site/account/Register");
 		}
+
 		Account entity = new Account();
 		BeanUtils.copyProperties(dto, entity);
 		entity.setRole(false);
+		  MultipartFile imageFile = dto.getImage();
+		    if (imageFile != null && !imageFile.isEmpty()) {
+		        File savedFile = paramService.save(imageFile, "/uploads/");
+		        if (savedFile != null) {
+		            entity.setImage(savedFile.getName());  // Lưu tên tệp hình ảnh vào cơ sở dữ liệu
+		        }
+		    }
 		accountService.save(entity);
 
 		model.addAttribute("message", "sucess , please login !!");
@@ -89,8 +102,12 @@ public class AccountController {
 		}
 
 		boolean isAdmin = entity.isRole();
+		
 		sessionService.set("account", entity.getUsername());
 		sessionService.set("isAdmin", isAdmin);
+		if (isAdmin) {
+			return new ModelAndView("redirect:/site/default/homeadmin", model);
+		}
 
 		return new ModelAndView("redirect:/site/home", model);
 	}

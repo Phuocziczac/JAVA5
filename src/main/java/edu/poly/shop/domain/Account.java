@@ -1,5 +1,7 @@
 package edu.poly.shop.domain;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,5 +21,7 @@ public class Account {
 	private String password;
 	private boolean role = false;
 	private Boolean isEdit = false;
+
+	private String image;
 	// getters and setters
 }

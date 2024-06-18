@@ -15,7 +15,8 @@ import edu.poly.shop.domain.Product;
 public interface ProductRepository extends JpaRepository<Product, Integer>{
 	Page<Product> findByproductNameContaining(String ProductName,Pageable pageable);
 	   Page<Product> findByCategoryIdAndProductNameContaining(Long categoryId, String productName, Pageable pageable);
-	
+	   Page<Product> findByStatus(String status, Pageable pageable);
+	   
 	   @Query("SELECT COUNT(p) AS totalProducts, COUNT(DISTINCT p.category) AS totalCategories FROM Product p")
 	    List<Object[]> getTotalProductsAndCategories();
 	    

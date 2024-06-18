@@ -35,6 +35,13 @@ public class ProductServiceImpl implements ProductService {
 
 	
 
+
+	  @Override
+	public Page<Product> findAvailableProductsPage(Pageable pageable) {
+        return productRepository.findByStatus("AVAILABLE", pageable);
+    }
+
+
 	@Override
 	public Page<Product> searchProducts(String keyword, Long categoryId, Pageable pageable) {
         if (categoryId != null) {

@@ -33,6 +33,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 request.setAttribute("account", user.getUsername());
                 request.setAttribute("isLogin", isLogin);
                 request.setAttribute("isAdmin", user.isRole());
+                request.setAttribute("imgurl", user.getImage());
             } else {
                 request.setAttribute("isLogin", false);
             }

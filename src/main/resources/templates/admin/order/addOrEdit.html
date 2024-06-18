@@ -57,15 +57,15 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="customer" class="form-label">Customer</label>
-                        <select class="form-select" th:field="*{customerId}">
-                            <!-- Đảm bảo trường này khớp với thuộc tính customerId trong OrderDto -->
+                        <label for="customerId" class="form-label">Customer</label>
+                        <select class="form-select" id="customerId" name="customerId">
+                            <option value="">Select Customer</option>
                             <option th:each="customer : ${customers}" th:value="${customer.customerId}"
-                                th:text="${customer.name}"></option>
+                                th:text="${customer.name}" th:selected="${customer.customerId == order.customerId}">
+                                Customer Name</option>
                         </select>
-                        <small th:if="${#fields.hasErrors('customerId')}" id="customerHelp"
-                            class="form-text text-danger">Please select a customer</small>
                     </div>
+
 
 
 

@@ -1,6 +1,7 @@
 package edu.poly.shop.controller.site;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -90,7 +91,7 @@ public class HomeController {
 				model.addAttribute("account", user.getUsername());
 				model.addAttribute("isLogin", isLogin);
 				model.addAttribute("isAdmin", user.isRole());
-				
+				model.addAttribute("imgurl", user.getImage());
 				return "forward:/site/product"; // Trả về trang chủ
 			} else {
 				return "redirect:/site/account/login"; // Chuyển hướng tới trang đăng nhập nếu người dùng không tồn tại
@@ -99,27 +100,17 @@ public class HomeController {
 			return "redirect:/site/account/login"; // Chuyển hướng tới trang đăng nhập nếu chưa đăng nhập
 		}
 	}
+
 	@RequestMapping("/default/homeadmin")
 	public String admin() {
 		return "site/default/homeadmin";
 	}
 
-	@RequestMapping("/product")
-	public String Product(Model model, @RequestParam(defaultValue = "0") int page) {
-	
-	
-		model.addAttribute("title", "Product");
-		List<Category> category = categoryService.findAll();
-		model.addAttribute("categories",category);
-		List<Product> products = productService.findAll();
-		model.addAttribute("product", products);
-	
-		 Pageable pageable = PageRequest.of(page, 10); // 10 sản phẩm mỗi trang
-	        Page<Product> productPage = productService.findAll(pageable);
-	        model.addAttribute("productPage", productPage);
-	        return "site/product";
-		
+	@RequestMapping("/aboutus")
+	public String aboutus() {
+		return "site/aboutus";
 	}
+
 
 	@RequestMapping("/order")
 	public String order(Model model) {
@@ -135,7 +126,7 @@ public class HomeController {
 			}
 		}
 		List<Order> listorder = orderService.findAll();
-		model.addAttribute("orders",listorder);
+		model.addAttribute("orders", listorder);
 		return "site/order";
 	}
 
@@ -197,7 +188,7 @@ public class HomeController {
 			totalPrice += item.getUnitPrice() * item.getQuantity();
 		}
 		List<Customer> customers = customerService.findAll(); // Phương thức để lấy danh sách khách hàng
-	    model.addAttribute("customers", customers);
+		model.addAttribute("customers", customers);
 		// Truyền tổng giá trị đến view
 		model.addAttribute("totalPrice", totalPrice);
 
@@ -207,25 +198,10 @@ public class HomeController {
 
 	@RequestMapping("/cart/add/{productID}")
 	public String addcart(Model model, @PathVariable("productID") int productId) {
-		boolean isLogin = true;
-		String username = sessionService.get("account");
-		if (username != null) {
-			Optional<Account> userOpt = accountService.findById(username);
-			if (userOpt.isPresent()) {
-				Account user = userOpt.get();
-				model.addAttribute("account", user.getUsername());
-				model.addAttribute("isLogin", isLogin);
-				model.addAttribute("isAdmin", user.isRole());
-			}
-		}
+
 		Optional<Product> entity = productService.findById(productId);
 		if (entity.isPresent()) {
 			Product product = entity.get();
-			CartItem cartItem = new CartItem();
-			cartItem.setProductId(product.getProductID());
-			cartItem.setName(product.getProductName());
-			cartItem.setQuantity(1); // default quantity is 1
-			cartItem.setUnitPrice(product.getUnitPrice());
 
 			// Get the cart from the session
 			List<CartItem> cart = (List<CartItem>) service.get("cart");
@@ -233,15 +209,36 @@ public class HomeController {
 				cart = new ArrayList<>();
 				service.set("cart", cart);
 			}
-		
-			// Add the cart item to the cart
-			cart.add(cartItem);
+
+			// Check if the product already exists in the cart
+			boolean found = false;
+			for (CartItem item : cart) {
+				if (item.getProductId() == product.getProductID()) {
+					// If product already exists, increase quantity by 1
+					item.setQuantity(item.getQuantity() + 1);
+					found = true;
+					break;
+				}
+			}
+
+			// If product is not found in cart, add new CartItem
+			if (!found) {
+				CartItem cartItem = new CartItem();
+				cartItem.setProductId(product.getProductID());
+				cartItem.setName(product.getProductName());
+				cartItem.setQuantity(1); // default quantity is 1
+				cartItem.setUnitPrice(product.getUnitPrice());
+				cart.add(cartItem);
+			}
+
+			// Update cart in session
+			service.set("cart", cart);
 			model.addAttribute("cartItems", cart);
 
 			// Redirect to the cart page
 			return "redirect:/site/cart";
 		} else {
-			// Product not found, redirect to error page
+			// Product not found, redirect to error page or home page
 			return "redirect:/site/home";
 		}
 	}
@@ -279,78 +276,88 @@ public class HomeController {
 
 		return "redirect:/site/cart"; // Chuyển hướng đến trang giỏ hàng
 	}
-	
+
 	@PostMapping("/order/add")
-	public ModelAndView addOrder(Model model, @Valid @ModelAttribute("customer") CustomerDto cusdto, BindingResult result, @RequestParam("customerId") Long customerId) {
-	    if (result.hasErrors()) {
-	        System.out.println(result.toString());
-	        return new ModelAndView("redirect:/site/cart");
-	    }
+	public ModelAndView addOrder(Model model, @Valid @ModelAttribute("customer") CustomerDto cusdto,
+			BindingResult result, @RequestParam(value = "customerId", required = false) Long customerId) {
+		if (customerId == null || customerId <= 0) {
+			model.addAttribute("message", "Vui lòng chọn khách hàng hoặc nhập thông tin khách hàng mới.");
+			return new ModelAndView("redirect:/site/cart");
+		}
+		if (result.hasErrors()) {
+			System.out.println(result.toString());
+			return new ModelAndView("redirect:/site/cart");
+		}
 
-	    List<CartItem> cartItems = (List<CartItem>) service.get("cart");
-	    if (cartItems == null || cartItems.isEmpty()) {
-	        return new ModelAndView("redirect:/site/cart");
-	    }
+		List<CartItem> cartItems = (List<CartItem>) service.get("cart");
+		if (cartItems == null || cartItems.isEmpty()) {
+			return new ModelAndView("redirect:/site/cart");
+		}
 
-	    Customer customer;
-	    if (customerId != null && customerId > 0) {
-	        // Use the selected customer
-	        Optional<Customer> customerOpt = customerService.findById(customerId);
-	        if (customerOpt.isPresent()) {
-	            customer = customerOpt.get();
-	        } else {
-	            // Handle case where the selected customer does not exist
-	            return new ModelAndView("redirect:/site/cart");
-	        }
-	    } else {
-	        // Create a new customer
-	        Customer cusentity = new Customer();
-	        BeanUtils.copyProperties(cusdto, cusentity);
-	        cusentity.setRegisterDate(new Date().toString());
-	        cusentity.setStatus("available");
-	        customer = customerService.save(cusentity);
-	    }
+		Customer customer;
+		if (customerId != null && customerId > 0) {
+			// Use the selected customer
+			Optional<Customer> customerOpt = customerService.findById(customerId);
+			if (customerOpt.isPresent()) {
+				customer = customerOpt.get();
+			} else {
+				model.addAttribute("message", "Không tìm thấy thông tin khách hàng.");
 
-	    // Create a new order
-	    Order entity = new Order();
-	    entity.setCustomer(customer);
-	    entity.setAmount(calculateTotalPrice(cartItems));
-	    entity.setOrderDate(new Date().toString());
-	    entity.setStatus("available");
-	    Order savedOrder = orderService.save(entity);
+				// Handle case where the selected customer does not exist
+				return new ModelAndView("redirect:/site/cart");
+			}
+		} else {
+			// Create a new customer
+			Customer cusentity = new Customer();
+			BeanUtils.copyProperties(cusdto, cusentity);
+			cusentity.setRegisterDate(new Date().toString());
+			cusentity.setStatus("ACTIVE");
+			customer = customerService.save(cusentity);
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-	    // Create order details
-	    for (CartItem item : cartItems) {
-	        OrderDetail detail = new OrderDetail();
-	        detail.setOrders(savedOrder);
-	        Optional<Product> product = productService.findById(item.getProductId());
-	        if (product.isPresent()) {
-	            detail.setProduct(product.get());
-	            detail.setQuantity(item.getQuantity());
-	            detail.setUnitPrice(item.getUnitPrice());
-	            detailService.save(detail);
-	        }
-	    }
+		Date currentDate = new Date();
 
-	    // Clear the cart
-	    service.remove("cart");
+		// Định dạng ngày tháng thành chuỗi "yyyy-MM-dd"
+		String formattedDate = sdf.format(currentDate);
+		// Create a new order
+		Order entity = new Order();
+		entity.setCustomer(customer);
+		entity.setAmount(calculateTotalPrice(cartItems));
+		entity.setOrderDate(formattedDate);
+		entity.setStatus("NEW");
+		Order savedOrder = orderService.save(entity);
 
-	    // Redirect to the order page
-	    return new ModelAndView("redirect:/site/order");
+		// Create order details
+		for (CartItem item : cartItems) {
+			OrderDetail detail = new OrderDetail();
+			detail.setOrders(savedOrder);
+			Optional<Product> product = productService.findById(item.getProductId());
+			if (product.isPresent()) {
+				detail.setProduct(product.get());
+				detail.setQuantity(item.getQuantity());
+				detail.setUnitPrice(item.getUnitPrice());
+				detailService.save(detail);
+			}
+		}
+
+		// Clear the cart
+		service.remove("cart");
+
+		// Redirect to the order page
+		return new ModelAndView("redirect:/site/order");
 	}
-
-
 
 	private double calculateTotalPrice(List<CartItem> cartItems) {
-	    double totalPrice = 0.0;
-	    for (CartItem item : cartItems) {
-	        totalPrice += item.getUnitPrice() * item.getQuantity();
-	    }
-	    return totalPrice;
+		double totalPrice = 0.0;
+		for (CartItem item : cartItems) {
+			totalPrice += item.getUnitPrice() * item.getQuantity();
+		}
+		return totalPrice;
 	}
-	
+
 	@RequestMapping("/orderdetail/{orderId}")
-	public String orderdetail(Model model,@PathVariable("orderId")Long orderId) {
+	public String orderdetail(Model model, @PathVariable("orderId") Long orderId) {
 		String username = sessionService.get("account");
 		if (username != null) {
 			Optional<Account> userOpt = accountService.findById(username);
@@ -364,24 +371,45 @@ public class HomeController {
 		}
 		Optional<Order> entity = orderService.findById(orderId);
 		Order order = entity.get();
-		model.addAttribute("order",order);
-		
-		System.out.println("cc"+order.getOrderDetails());
-		
+		model.addAttribute("order", order);
+
+		System.out.println("cc" + order.getOrderDetails());
+
 		List<OrderDetail> listdetail = orderService.findOrderDetailListByOrderId(orderId);
-		System.out.println("fsf"+listdetail);
+		System.out.println("fsf" + listdetail);
 		return "site/orderdetail";
 	}
-	
 
-    @PostMapping("/search")
-    public String searchProducts(@RequestParam("keyword") String keyword, @RequestParam(required = false) Long category, Model model, @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, 10);
-        List<Category> categoryid = categoryService.findAll();
-		model.addAttribute("categories",categoryid);
-        Page<Product> productPage = productService.searchProducts(keyword, category, pageable);
-        model.addAttribute("productPage", productPage);
-        return "redirect:/site/home";
-    }
+	@PostMapping("/search")
+	public String searchProducts(@RequestParam("keyword") String keyword, @RequestParam(required = false) Long category,
+			Model model, @RequestParam(defaultValue = "0") int page) {
+		boolean isLogin = true;
+		String username = sessionService.get("account");
+
+		if (username != null) {
+			Optional<Account> userOpt = accountService.findById(username);
+			if (userOpt.isPresent()) {
+				Account user = userOpt.get();
+				model.addAttribute("account", user.getUsername());
+				model.addAttribute("imgurl", user.getImage());
+				System.out.println("sss" + user.getImage());
+				model.addAttribute("isLogin", isLogin);
+				model.addAttribute("isAdmin", user.isRole());
+			}
+		}
+		Pageable pageable = PageRequest.of(page, 10);
+		List<Category> categoryid = categoryService.findAll();
+		model.addAttribute("categories", categoryid);
+		Page<Product> productPage = null;
+		
+			 productPage = productService.searchProducts(keyword, category, pageable);
+		
+			
+			
+
+		
+		model.addAttribute("productPage", productPage);
+		return "site/product";
+	}
 
 }

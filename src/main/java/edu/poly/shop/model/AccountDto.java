@@ -3,6 +3,7 @@ package edu.poly.shop.model;
 import java.io.Serializable;
 
 import org.hibernate.validator.constraints.Length;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -21,5 +22,7 @@ public class AccountDto implements Serializable {
 	private String password;
 	@NotNull
 	private boolean role = false;
+	private MultipartFile image;  
+	private String imgurl;
 	private Boolean isEdit = false;
 }

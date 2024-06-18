@@ -30,6 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import edu.poly.shop.domain.Account;
 import edu.poly.shop.domain.Category;
+import edu.poly.shop.domain.Customer;
 import edu.poly.shop.model.CategoryDto;
 import edu.poly.shop.service.AccountService;
 import edu.poly.shop.service.CategoryService;
@@ -171,8 +172,10 @@ public class CategoryController {
 	}
 
 	@GetMapping("searchpaginated")
-	public String search(ModelMap model, @RequestParam(name = "name", required = false) String name,
-			@RequestParam("page") Optional<Integer> page, @RequestParam("size") Optional<Integer> size) {
+	
+	public String search(ModelMap model,
+	                     @RequestParam(name = "name", required = false) String name,
+	                     @RequestParam("p") Optional<Integer> p) {
 		String username = sessionService.get("account");
 		if (username != null) {
 			Optional<Account> userOpt = accountService.findById(username);
@@ -184,33 +187,20 @@ public class CategoryController {
 				model.addAttribute("isAdmin", user.isRole());
 			}
 		}
-		int currentPage = page.orElse(0);
-		int pageSize = size.orElse(5);
-		Pageable pageable = PageRequest.of(currentPage, pageSize, Sort.by("name"));
-		Page<Category> resultPage = null;
-		List<Category> list = null;
-		if (StringUtils.hasText(name)) {
-			resultPage = categoryServiceImpl.findByNameContaining(name, pageable);
-			model.addAttribute("name", name);
-		} else {
-			resultPage = categoryServiceImpl.findAll(pageable);
-			System.out.println("alo" + resultPage);
-		}
-		int totalPages = resultPage.getTotalPages();
-		if (totalPages > 0) {
-			int start = Math.max(1, currentPage - 2);
-			int end = Math.min(currentPage + 2, totalPages);
-			if (totalPages > 5) {
-				if (end == totalPages) {
-					start = end - 5;
-				} else if (start == 1) {
-					end = start + 5;
-				}
-			}
-			List<Integer> pageNumbers = IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
-			model.addAttribute("pageNumbers", pageNumbers);
-		}
-		model.addAttribute("categoryPage", resultPage);
-		return "admin/categories/searchpaginated";
+	    Pageable pageable = PageRequest.of(p.orElse(0), 5);
+	    Page<Category> page = categoryServiceImpl.findAll(pageable);
+	    model.addAttribute("page", page);
+
+	    Page<Category> resultPage;
+	    if (StringUtils.hasText(name)) {
+	        resultPage = categoryServiceImpl.findByNameContaining(name, pageable);
+	        model.addAttribute("name", name);
+	    } else {
+	        resultPage = categoryServiceImpl.findAll(pageable);
+	    }
+	    model.addAttribute("categoryPage", resultPage);
+
+	    return "admin/categories/searchpaginated";
 	}
+
 }

@@ -16,7 +16,8 @@
                         <h2>Register</h2>
                     </div>
                     <div class="card-body">
-                        <form th:action="@{/site/account/Register/add}" th:object="${account}" method="post">
+                        <form th:action="@{/site/account/Register/add}" th:object="${account}" method="post"
+                            enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="username" th:field="*{username}" required>
@@ -30,16 +31,12 @@
                                 <small th:if="${#fields.hasErrors('password')}" id="categoryhelpID"
                                     class="form-text text-muted">Password is Required</small>
                             </div>
-                            <!-- <div class="mb-3">
-                                <label for="role" class="form-label">Role</label>
-                                <select class="form-select" id="role" th:field="*{role}" required>
-
-                                    <option th:value="true">Admin</option>
-                                    <option th:value="false" selected>User</option>
-                                </select>
-                                <small th:if="${#fields.hasErrors('role')}" id="categoryhelpID"
-                                    class="form-text text-muted">Role is Required</small>
-                            </div> -->
+                            <div class="mb-3">
+                                <label for="profileImage" class="form-label">Profile Image</label>
+                                <input type="file" class="form-control" th:field="*{image}"
+                                    aria-describedby="profileImageHelp" />
+                                <small id="profileImageHelp" class="form-text text-muted">Upload a profile image</small>
+                            </div>
                             <button type="submit" class="btn btn-primary">Register</button>
                             <p th:text="${message}" class="text-success mt-3 text-center"></p>
                         </form>

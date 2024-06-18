@@ -18,7 +18,8 @@
         <!-- place navbar here -->
     </header>
     <main class="container mt-5" layout:fragment="content">
-        <form th:action="@{/admin/profile/saveOrUpdate}" method="post" th:object="${account}">
+        <form th:action="@{/admin/profile/saveOrUpdate}" method="post" th:object="${account}"
+            enctype="multipart/form-data">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title">Add New Account</h5>
@@ -33,15 +34,14 @@
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" th:field="*{password}"
-                            aria-describedby="passwordHelp" placeholder="Enter Password" />
+                        <input type="text" class="form-control" th:field="*{password}" aria-describedby="passwordHelp"
+                            placeholder="Enter Password" />
                         <small id="passwordHelp" class="form-text text-muted">Enter the Password</small>
                     </div>
 
                     <div class="mb-3">
                         <label for="role" class="form-label">Role</label>
                         <select class="form-select" th:field="*{role}" aria-describedby="roleHelp">
-
                             <option value="false" active>User</option>
                             <option value="true">Admin</option>
                             <!-- Add more roles as needed -->
@@ -49,6 +49,17 @@
                         <small th:if="${#fields.hasErrors('role')}" id="roleHelp" class="form-text text-danger">Role is
                             required</small>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Ảnh hồ sơ</label>
+                        <input type="file" class="form-control" th:field="*{image}">
+                        <div class="mb-3">
+                            <label for="imgurl" class="form-label">Image URL</label>
+                            <input type="text" class="form-control" th:field="*{imgurl}" id="imgurl" name="imgurl">
+                        </div>
+                        <small id="profileImageHelp" class="form-text text-muted">Upload a profile image</small>
+                    </div>
+
 
                     <button class="btn btn-danger me-2" type="reset">Reset</button>
                     <a th:href="@{/admin/profile/search}" class="btn btn-primary me-2">List Accounts</a>

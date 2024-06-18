@@ -81,14 +81,23 @@ public Date getDate(String name, String pattern) {
 */
 public File save(MultipartFile file, String path) {
     if (!file.isEmpty()) {
-        // Đường dẫn tương đối từ thư mục static
+        String originalFileName = file.getOriginalFilename();
         String absolutePath = new File("src/main/resources/static/images/" + path).getAbsolutePath();
         File dir = new File(absolutePath);
+        
         if (!dir.exists()) {
             dir.mkdirs();
         }
+        
+        File saveFile = new File(dir, originalFileName);
+
+        // Kiểm tra nếu tệp đã tồn tại thì không cần lưu lại
+        if (saveFile.exists()) {
+            System.out.println("File already exists: " + saveFile.getAbsolutePath());
+            return saveFile;
+        }
+
         try {
-            File saveFile = new File(dir, file.getOriginalFilename());
             file.transferTo(saveFile);
             System.out.println("File saved: " + saveFile.getAbsolutePath());
             return saveFile;
@@ -98,5 +107,6 @@ public File save(MultipartFile file, String path) {
     }
     return null;
 }
+
 
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{site/default/layout}">
 
 <head>
     <meta charset="UTF-8">
@@ -13,8 +14,8 @@
             padding: 0;
         }
 
-        header {
-            background-color: #333;
+        header.aboutus {
+            background-color: rgb(220, 135, 196);
             color: #fff;
             padding: 10px 20px;
             text-align: center;
@@ -37,86 +38,95 @@
 </head>
 
 <body>
-    <header>
-        <h1>About Us</h1>
-    </header>
-    <div class="container">
+    <section layout:fragment="content">
+        <header class="aboutus">
+            <h1>About Us</h1>
+        </header>
+        <div class="container">
 
-        11/06/2021
+            11/06/2021
 
-        Tự hào là TIỆM HOA LỤA ĐẦU TIÊN, đi đầu trong việc thiết kế, sáng tạo ra những dòng sản phẩm hoa lụa, những sản
-        phẩm của bông by catt luôn được yêu thích và tạo ra một xu hướng tặng quà mới: những bó hoa lụa Tiny xinh xắn
-        được xếp ngay ngắn trong hộp, hay những lọ hoa, hộp hoa lụa Zilyn cao cấp cùng với Topper và những lời chúc yêu
-        thương được Catt ghi lại bằng tay - đã trở thành những sản phẩm nổi bật, đặc trưng mang dấu ấn bông by catt.
-
-
-
-        Tinh tế và tràn đầy cảm xúc - là cảm giác mà bông by catt muốn mang tới cho những khách hàng của mình khi nhận
-        được những món quà được chuẩn bị tỉ mỉ, chỉn chu bởi những cô gái nhà Catt. Đó không chỉ là hoa mà còn là cả tấm
-        lòng của người mang tặng, là cả tâm huyết, tình yêu của Bông by catt gửi gắm trong đó…
+            Tự hào là TIỆM HOA LỤA ĐẦU TIÊN, đi đầu trong việc thiết kế, sáng tạo ra những dòng sản phẩm hoa lụa, những
+            sản
+            phẩm của bông by catt luôn được yêu thích và tạo ra một xu hướng tặng quà mới: những bó hoa lụa Tiny xinh
+            xắn
+            được xếp ngay ngắn trong hộp, hay những lọ hoa, hộp hoa lụa Zilyn cao cấp cùng với Topper và những lời chúc
+            yêu
+            thương được Catt ghi lại bằng tay - đã trở thành những sản phẩm nổi bật, đặc trưng mang dấu ấn bông by catt.
 
 
 
-        Bông by catt cung cấp nhiều dịch vụ với từng mục đích khác nhau:
-
-        · Điện hoa online toàn quốc (Giao trong ngày tại Hà Nội)
-
-        · Hoa lụa quà tặng doanh nghiệp
-
-        · Cắm hoa theo yêu cầu
-
-        · Trang trí hoa cho shop, event
-
-
-        <img src="" alt="">
+            Tinh tế và tràn đầy cảm xúc - là cảm giác mà bông by catt muốn mang tới cho những khách hàng của mình khi
+            nhận
+            được những món quà được chuẩn bị tỉ mỉ, chỉn chu bởi những cô gái nhà Catt. Đó không chỉ là hoa mà còn là cả
+            tấm
+            lòng của người mang tặng, là cả tâm huyết, tình yêu của Bông by catt gửi gắm trong đó…
 
 
 
+            Bông by catt cung cấp nhiều dịch vụ với từng mục đích khác nhau:
 
-        Bông by catt muốn tiếp thêm yêu thương trong cuộc sống, muốn tiếp thêm sức mạnh cho tình yêu và muốn những điều
-        bất ngờ, ngọt ngào, khác biệt nhất đến với mọi người.
+            · Điện hoa online toàn quốc (Giao trong ngày tại Hà Nội)
 
-        Every flower is a soul blossoming. Let bông by catt send your sweet messages to all the most beautiful women of
-        your life.
+            · Hoa lụa quà tặng doanh nghiệp
+
+            · Cắm hoa theo yêu cầu
+
+            · Trang trí hoa cho shop, event
 
 
-
-        ・•・•・•・
-
-        Bông by catt - Hoa lụa cao cấp
-
-        Điện hoa online toàn quốc
-
-        Hotline: 0942 98 6000
-
-        Instagram: @bongbycatt
+            <img src="" alt="">
 
 
 
-        Add 1: Bông by catt store - Số 07 Hàng Vôi, Hoàn Kiếm, Hà Nội
 
-        • Gift & Home decor | Concept store
+            Bông by catt muốn tiếp thêm yêu thương trong cuộc sống, muốn tiếp thêm sức mạnh cho tình yêu và muốn những
+            điều
+            bất ngờ, ngọt ngào, khác biệt nhất đến với mọi người.
 
-        • Mở cửa hàng ngày: 8:00 - 21:00
-
-
-
-        Add 2: Bông by catt showroom - Tầng 3, số 90 Vọng Hà, Hoàn Kiếm, Hà Nội
-
-        • Workshop cắm hoa
-
-        • Showroom 300m2 hoa cành và lọ hoa nội thất
-
-        • Mở cửa hàng ngày: 8:00 - 17:00
+            Every flower is a soul blossoming. Let bông by catt send your sweet messages to all the most beautiful women
+            of
+            your life.
 
 
 
-        Add 3: Retailer Sóc&Brothers - Số 17 Lý Thường Kiệt, Hoàn Kiếm, Hà Nội
+            ・•・•・•・
 
-        • Gift shop & Baby goods/Kids goods
+            Bông by catt - Hoa lụa cao cấp
 
-        • Mở cửa hàng ngày: 8:00 - 21:00
-    </div>
+            Điện hoa online toàn quốc
+
+            Hotline: 0942 98 6000
+
+            Instagram: @bongbycatt
+
+
+
+            Add 1: Bông by catt store - Số 07 Hàng Vôi, Hoàn Kiếm, Hà Nội
+
+            • Gift & Home decor | Concept store
+
+            • Mở cửa hàng ngày: 8:00 - 21:00
+
+
+
+            Add 2: Bông by catt showroom - Tầng 3, số 90 Vọng Hà, Hoàn Kiếm, Hà Nội
+
+            • Workshop cắm hoa
+
+            • Showroom 300m2 hoa cành và lọ hoa nội thất
+
+            • Mở cửa hàng ngày: 8:00 - 17:00
+
+
+
+            Add 3: Retailer Sóc&Brothers - Số 17 Lý Thường Kiệt, Hoàn Kiếm, Hà Nội
+
+            • Gift shop & Baby goods/Kids goods
+
+            • Mở cửa hàng ngày: 8:00 - 21:00
+        </div>
+    </section>
 </body>
 
 </html>

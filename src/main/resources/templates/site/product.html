@@ -67,22 +67,25 @@
             </form>
 
             <div class="row">
+                <!-- Loop through each product -->
                 <div class="col-md-3 mb-5" th:each="product : ${productPage.content}">
-                    <div th:if="${product.status != 'UNAVAILABLE'}">
-                        <div class="card">
-                            <img th:src="@{'/images/uploads/'+${product.image}}" class="card-img-top"
-                                alt="Product Image" style="width: 100%; height: auto;">
-                            <div class="card-body">
-                                <h5 class="card-title" th:text="${product.productName}">Product Name</h5>
-                                <p class="card-text">Price: $<span th:text="${product.unitPrice}">0.00</span></p>
-                                <p class="card-text">Quantity: <span th:text="${product.quantity}">0</span></p>
-                                <a th:href="@{'/site/detailproduct/' +${product.productID}}" class="btn btn-primary"
-                                    style="float: right;">View Details</a>
-                            </div>
+                    <!-- Check if the product is AVAILABLE -->
+
+                    <div class="card">
+                        <img th:src="@{'/images/uploads/' + ${product.image}}" class="card-img-top" alt="Product Image"
+                            style="width: 100%; height: auto;">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${product.productName}">Product Name</h5>
+                            <p class="card-text">Price: $<span th:text="${product.unitPrice}">0.00</span></p>
+                            <p class="card-text">Quantity: <span th:text="${product.quantity}">0</span></p>
+                            <a th:href="@{'/site/detailproduct/' + ${product.productID}}" class="btn btn-primary"
+                                style="float: right;">View Details</a>
                         </div>
                     </div>
+
                 </div>
             </div>
+
 
 
 

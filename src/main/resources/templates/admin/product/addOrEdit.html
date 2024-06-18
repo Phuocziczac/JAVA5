@@ -75,16 +75,10 @@
                         <label for="image" class="form-label">Image</label>
                         <!-- Input field for image -->
                         <input type="file" class="form-control" id="image" name="image" aria-describedby="imageHelp" />
-
-
-
-
-                        <!-- Handle case where no image is selected -->
-                        <div th:unless="${product.imgurl}">
-                            <p class="text-danger">No image selected</p>
+                        <div class="mb-3">
+                            <label for="imgurl" class="form-label">Image URL</label>
+                            <input type="text" class="form-control" th:field="*{imgurl}" id="imgurl" name="imgurl">
                         </div>
-
-                        <!-- Error message for invalid image selection -->
                         <small class="text-danger" th:if="${#fields.hasErrors('image')}" th:errors="*{image}">Invalid
                             image</small>
                     </div>

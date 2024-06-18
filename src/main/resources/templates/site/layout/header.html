@@ -10,11 +10,9 @@
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <style>
         .navbar {
-            background-image: url('https://i.pinimg.com/originals/5c/43/d2/5c43d280ddfbd4a1b4c571874e699f8d.gif ');
-            /* Đường dẫn đến hình nền */
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
+            background-color: #c4ca85;
+            /* Change this to the desired color */
+            color: #ffffff;
         }
 
         .navbar-brand {
@@ -45,6 +43,17 @@
         .dropdown-menu a:hover {
             background-color: #f8f9fa;
         }
+
+        .profile-img {
+            width: 40px;
+            /* Adjust size as needed */
+            height: 40px;
+            /* Adjust size as needed */
+            border-radius: 50%;
+            /* Makes the image circular */
+            object-fit: cover;
+            /* Ensures the image covers the box without stretching */
+        }
     </style>
 </head>
 
@@ -53,7 +62,8 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
             <div class="container-fluid">
-                <a class="navbar-brand" th:href="@{/site/product}">FLOWER FOR YOU</a>
+                <a class="navbar-brand" href="#" onclick="window.location.reload();">FLOWER FOR YOU</a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -71,11 +81,9 @@
                         <li class="nav-item">
                             <a class="nav-link" th:href="@{/site/order}"><i class="fas fa-shopping-bag"></i> Order</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/site/contact}"><i class="fas fa-info"></i> Contact</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/site/about}"><i class="fas fa-people-arrows"></i> About
+                            <a class="nav-link" th:href="@{/site/aboutus}"><i class="fas fa-people-arrows"></i> About
                                 Us</a>
                         </li>
                     </ul>
@@ -117,11 +125,11 @@
                         </li>
                     </ul>
 
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav" style=" margin-right: 70px;">
                         <li class="nav-item dropdown" th:if="${isLogin}">
                             <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user"></i> Account
+                                <img th:src="@{'/images/uploads/' + ${imgurl}}" alt="Profile Image" class="profile-img">
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="accountDropdown">
                                 <li><a class="dropdown-item" th:href="@{/site/account/changepassword}">Change
@@ -145,9 +153,7 @@
                         </li>
                     </ul>
 
-                    <span class="navbar-text" th:if="${isLogin}">
-                        <h4 th:text="'Hello, ' + ${session.account} + '!'"></h4>
-                    </span>
+
                 </div>
             </div>
         </nav>

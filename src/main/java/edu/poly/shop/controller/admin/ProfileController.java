@@ -1,8 +1,10 @@
 package edu.poly.shop.controller.admin;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.angus.mail.handlers.image_gif;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import edu.poly.shop.domain.Account;
@@ -27,72 +30,86 @@ import edu.poly.shop.model.AccountDto;
 import edu.poly.shop.model.CustomerDto;
 import edu.poly.shop.service.AccountService;
 import edu.poly.shop.service.CustomerService;
+import edu.poly.shop.service.ParamService;
 import edu.poly.shop.service.SessionService;
 import jakarta.validation.Valid;
-
-
 
 @Controller
 @RequestMapping("admin/profile/")
 public class ProfileController {
 	@Autowired
 	CustomerService customerService;
-	
+
 	@Autowired
 	SessionService sessionService;
 	@Autowired
 	AccountService accountService;
+	@Autowired
+	private ParamService paramService;
+
 	@GetMapping("/add")
 	public String add(Model model) {
-		  
+
 		model.addAttribute("account", new AccountDto());
 		return "admin/profile/addOrEdit";
 	}
-
-	
 
 	@PostMapping("saveOrUpdate")
 	public ModelAndView saveOrUpdate(ModelMap model, @Valid @ModelAttribute("account") AccountDto dto,
 			BindingResult result) {
 		if (result.hasErrors()) {
-                   System.out.println(result.toString());
-                   System.out.println("sdad"+result.getFieldError());
+			System.out.println(result.toString());
+			System.out.println("sdad" + result.getFieldError());
 			return new ModelAndView("admin/profile/addOrEdit");
 		}
+
 		Account entity = new Account();
 		BeanUtils.copyProperties(dto, entity);
-		
+		MultipartFile imageFile = dto.getImage();
+		System.out.println(dto.getImage());
+		 if (imageFile != null && !imageFile.isEmpty()) {
+	            File savedFile = paramService.save(imageFile, "/uploads/");
+	            if (savedFile != null) {
+	                entity.setImage(savedFile.getName());
+	            }
+	        } else {
+	            // Xử lý trường hợp không có tệp mới được tải lên
+	            entity.setImage(dto.getImgurl()); // Giả sử getImgurl() trả về đường dẫn/tên hình ảnh hiện có
+	        }
 		accountService.save(entity);
 
 		model.addAttribute("message", "account is save");
 		return new ModelAndView("redirect:/admin/profile/search", model);
 	}
+
 	@GetMapping("/edit/{username}")
-	public ModelAndView edit(ModelMap model,@PathVariable("username") String username) {
-	    Optional<Account> opt = accountService.findById(username);
-	   AccountDto dto = new AccountDto();
-	    if(opt.isPresent()) {
-	    	Account entity = opt.get();
-	    	BeanUtils.copyProperties(entity, dto);
-	    	dto.setIsEdit(true);
-	    	
-	    	model.addAttribute("account",dto);
-	    	return new ModelAndView("admin/profile/addOrEdit",model) ;
-	    }
-	    	model.addAttribute("message","Account is not existed");
-		return new ModelAndView("redirect:/admin/profile/search",model) ;
+	public ModelAndView edit(ModelMap model, @PathVariable("username") String username) {
+		Optional<Account> opt = accountService.findById(username);
+		AccountDto dto = new AccountDto();
+		if (opt.isPresent()) {
+			Account entity = opt.get();
+			BeanUtils.copyProperties(entity, dto);
+			dto.setIsEdit(true);
+			System.out.println("hh" + dto.getPassword());
+			dto.setImgurl(entity.getImage());
+			model.addAttribute("account", dto);
+			return new ModelAndView("admin/profile/addOrEdit", model);
+		}
+		model.addAttribute("message", "Account is not existed");
+		return new ModelAndView("redirect:/admin/profile/search", model);
 	}
+
 	@GetMapping("delete/{username}")
-	public ModelAndView delete (ModelMap model,@PathVariable("username") String username) {
+	public ModelAndView delete(ModelMap model, @PathVariable("username") String username) {
 		accountService.deleteById(username);
-		model.addAttribute("message","Account is deleted");
-		
-		return new ModelAndView("forward:/admin/profile/search",model) ;
+		model.addAttribute("message", "Account is deleted");
+
+		return new ModelAndView("forward:/admin/profile/search", model);
 	}
+
 	@GetMapping("search")
-	public String search(ModelMap model,
-	                     @RequestParam(name = "username", required = false) String name,
-	                     @RequestParam("p") Optional<Integer> p) {
+	public String search(ModelMap model, @RequestParam(name = "username", required = false) String name,
+			@RequestParam("p") Optional<Integer> p) {
 		String username = sessionService.get("account");
 		if (username != null) {
 			Optional<Account> userOpt = accountService.findById(username);
@@ -104,20 +121,19 @@ public class ProfileController {
 				model.addAttribute("isAdmin", user.isRole());
 			}
 		}
-	    Pageable pageable = PageRequest.of(p.orElse(0), 5);
-	    Page<Account> resultPage;
-	    Page<Account> page = accountService.findAll(pageable);
-	    model.addAttribute("page", page);
+		Pageable pageable = PageRequest.of(p.orElse(0), 5);
+		Page<Account> resultPage;
+		Page<Account> page = accountService.findAll(pageable);
+		model.addAttribute("page", page);
 
-	 
-	    if (StringUtils.hasText(name)) {
-	        resultPage = accountService.findByUsernameContaining(name, pageable);
-	        model.addAttribute("username", name);
-	    } else {
-	        resultPage = accountService.findAll(pageable);
-	    }
-	    model.addAttribute("profilePage", resultPage);
+		if (StringUtils.hasText(name)) {
+			resultPage = accountService.findByUsernameContaining(name, pageable);
+			model.addAttribute("username", name);
+		} else {
+			resultPage = accountService.findAll(pageable);
+		}
+		model.addAttribute("profilePage", resultPage);
 
-	    return "admin/profile/search";
+		return "admin/profile/search";
 	}
 }

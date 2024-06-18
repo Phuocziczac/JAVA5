@@ -100,11 +100,14 @@ public class ProductsController {
 
 	    MultipartFile imageFile = dto.getImage();
 	    if (imageFile != null && !imageFile.isEmpty()) {
-	        File savedFile = paramService.save(imageFile, "/uploads/");
-	        if (savedFile != null) {
-	            entity.setImage(savedFile.getName());  // Lưu tên tệp hình ảnh vào cơ sở dữ liệu
-	        }
-	    }
+            File savedFile = paramService.save(imageFile, "/uploads/");
+            if (savedFile != null) {
+                entity.setImage(savedFile.getName());
+            }
+        } else {
+            // Xử lý trường hợp không có tệp mới được tải lên
+            entity.setImage(dto.getImgurl()); // Giả sử getImgurl() trả về đường dẫn/tên hình ảnh hiện có
+        }
 
 	    productService.save(entity);
 	    model.addAttribute("message", "Product is saved");

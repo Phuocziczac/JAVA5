@@ -65,6 +65,10 @@ public interface ProductService {
 
 	Page<Product> searchProducts(String keyword, Long categoryId, Pageable pageable);
 
+	Page<Product> findAvailableProductsPage(Pageable pageable);
+
+	
+
 	
 
 	

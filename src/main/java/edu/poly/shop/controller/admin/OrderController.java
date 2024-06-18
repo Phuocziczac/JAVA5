@@ -89,6 +89,8 @@ public class OrderController {
 			Order entity = opt.get();
 			BeanUtils.copyProperties(entity, dto);
 			dto.setIsEdit(true);
+			dto.setCustomerId(entity.getCustomer().getCustomerId());
+			System.out.println("dsds"+dto.getOrderDate());
 		    List<Customer> listcus = customerService.findAll();
 		    model.addAttribute("customers",listcus);
 			model.addAttribute("order", dto);

@@ -18,7 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**") // Đăng ký interceptor cho tất cả các đường dẫn
-                .excludePathPatterns("/site/product","/site/home"); // Ngoại trừ trang chủ
+                .excludePathPatterns("/site/home"); // Ngoại trừ trang chủ
     }
 
 }
